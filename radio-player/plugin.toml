@@ -1,0 +1,39 @@
+id          = "nyx/radio-player"
+name        = "Radio Player"
+version     = "1.0.0"
+plugin_api  = 24
+author      = "nyx"
+license     = "MIT"
+icon        = "radio"
+description = "Bar widget with a click-out panel: play/pause, next/prev, and a list of internet radio stations."
+tags        = ["media", "radio", "audio"]
+dependencies = ["mpv"]
+
+[[setting]]
+key             = "stations"
+type            = "string_list"
+label_key       = "settings.stations.label"
+description_key = "settings.stations.description"
+default = [
+  "TechnoBase.FM|http://listen.technobase.fm/tunein-mp3",
+  "HouseTime.FM|http://listen.housetime.fm/tunein-mp3",
+  "HardBase.FM|http://listen.hardbase.fm/tunein-mp3",
+  "TranceBase.FM|http://listen.trancebase.fm/tunein-mp3",
+]
+
+[[widget]]
+id    = "widget"
+entry = "widget.luau"
+
+[[service]]
+id    = "radio-service"
+entry = "service.luau"
+
+[[panel]]
+id              = "player"
+entry           = "panel.luau"
+width           = 320
+height          = 420
+placement       = "floating"
+position        = "auto"
+open_near_click = true

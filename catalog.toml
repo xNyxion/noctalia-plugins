@@ -1,0 +1,20 @@
+# Plugin source catalog. Indexes every plugin in this repo so a Noctalia
+# host can list and compat-check them without cloning the whole thing.
+# Each plugin lives in the subdirectory matching the part of its id after
+# the "/" -- nyx/radio-player -> radio-player/.
+#
+# Keep these rows in sync with each plugin's own plugin.toml; the catalog
+# is what the store reads, the manifest is what the runtime reads.
+
+[[plugin]]
+id           = "nyx/radio-player"
+name         = "Radio Player"
+version      = "1.0.0"
+author       = "nyx"
+license      = "MIT"
+icon         = "radio"
+description  = "Bar widget with a click-out panel: play/pause, next/prev, and a list of internet radio stations."
+deprecated   = false
+plugin_api   = 24
+tags         = ["media", "radio", "audio"]
+dependencies = ["mpv"]

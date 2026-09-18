@@ -1,0 +1,10 @@
+{
+  "settings.stations.label": "Stations",
+  "settings.stations.description": "One per line, formatted as Name|StreamURL. Order here is the order shown in the panel.",
+  "widget.tooltip": "Click to open the radio player",
+  "panel.title": "Radio",
+  "panel.idle": "Nothing playing",
+  "notify.no_stations": "No stations configured. Add some in the plugin settings.",
+  "notify.mpv_missing": "mpv is not installed or failed to start.",
+  "notify.stream_ended": "Stream ended. Press play to reconnect."
+}
