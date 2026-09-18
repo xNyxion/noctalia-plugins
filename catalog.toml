@@ -9,12 +9,12 @@
 [[plugin]]
 id           = "nyx/radio-player"
 name         = "Radio Player"
-version      = "1.0.0"
+version      = "2.0.0"
 author       = "nyx"
 license      = "MIT"
 icon         = "radio"
-description  = "Bar widget with a click-out panel: play/pause, next/prev, and a list of internet radio stations."
+description  = "Browse radio-browser.info stations, star the keepers, and play them headless via mpv. Ships a curated metal folder."
 deprecated   = false
 plugin_api   = 24
-tags         = ["media", "radio", "audio"]
+tags         = ["media", "radio", "audio", "metal", "network"]
 dependencies = ["mpv"]

@@ -1,29 +1,44 @@
 id          = "nyx/radio-player"
 name        = "Radio Player"
-version     = "1.0.0"
+version     = "2.0.0"
 plugin_api  = 24
 author      = "nyx"
 license     = "MIT"
 icon        = "radio"
-description = "Bar widget with a click-out panel: play/pause, next/prev, and a list of internet radio stations."
-tags        = ["media", "radio", "audio"]
+description = "Browse radio-browser.info stations, star the keepers, and play them headless via mpv. Ships a curated metal folder."
+tags        = ["media", "radio", "audio", "metal", "network"]
 dependencies = ["mpv"]
 
+# Favorites are NOT a setting: they live in favorites.json in the plugin data
+# dir, owned by the service. A string_list setting would make the star button
+# unable to write them back, and would not survive as structured data.
+
 [[setting]]
-key             = "stations"
-type            = "string_list"
-label_key       = "settings.stations.label"
-description_key = "settings.stations.description"
-default = [
-  "TechnoBase.FM|http://listen.technobase.fm/tunein-mp3",
-  "HouseTime.FM|http://listen.housetime.fm/tunein-mp3",
-  "HardBase.FM|http://listen.hardbase.fm/tunein-mp3",
-  "TranceBase.FM|http://listen.trancebase.fm/tunein-mp3",
-]
+key             = "volume"
+type            = "int"
+label_key       = "settings.volume.label"
+description_key = "settings.volume.description"
+default         = 85
+min             = 0
+max             = 100
+
+[[setting]]
+key             = "search_limit"
+type            = "int"
+label_key       = "settings.search_limit.label"
+description_key = "settings.search_limit.description"
+default         = 25
+min             = 5
+max             = 50
 
 [[widget]]
 id    = "widget"
 entry = "widget.luau"
+
+  # Free the middle button for the script; every widget otherwise gets a
+  # built-in "open settings" binding that swallows onMiddleClick.
+  [widget.actions]
+  middle = "none"
 
 [[service]]
 id    = "radio-service"
@@ -32,8 +47,8 @@ entry = "service.luau"
 [[panel]]
 id              = "player"
 entry           = "panel.luau"
-width           = 320
-height          = 420
+width           = 420
+height          = 620
 placement       = "floating"
 position        = "auto"
 open_near_click = true
