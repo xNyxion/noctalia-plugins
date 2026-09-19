@@ -213,10 +213,9 @@ restarts the stream, on purpose" above) and the volume curve (mpv's
 `--volume` is cubic, not linear — see "Volume slider is perceptual, not
 linear amplitude"). Verified live via IPC (`volume <N>`) + `/proc/<pid>/cmdline`
 showing the converted mpv value at several slider positions, and via the log
-showing hot-reload with no new `[ERR]`. **Not verified:** an actual mouse
-drag on the slider (every check above went through IPC, which exercises
-`setVolume`/`playStation` but not the panel's `ui.slider` callbacks
-themselves) — do that once before trusting this fully.
+showing hot-reload with no new `[ERR]`. Hands-on mouse drag confirmed working
+by the user post-merge: stream pauses briefly (the documented restart cost)
+and resumes at the new, correctly-curved level.
 
 ## Debugging checklist
 
