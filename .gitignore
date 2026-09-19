@@ -1,0 +1,16 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Local Noctalia runtime state, if ever tested from inside this checkout
+# instead of the real pluginDataDir (~/.local/state/noctalia/plugins/data/...)
+*.pid
+*.log
+
+# Scratch/local-only notes not meant for the repo
+*.local.md
