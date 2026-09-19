@@ -203,6 +203,21 @@ local function shellQuote(s)
   return "'" .. string.gsub(tostring(s), "'", "'\\''") .. "'"
 end
 
+-- mpv's --volume is a CUBIC gain curve, not linear amplitude: dB is
+-- roughly 60*log10(v/100), so 20% amplitude is already a ~42dB cut and
+-- sounds close to silent. A 1:1 slider mapping made the bottom third of
+-- the range useless. Apply a sqrt curve so the SLIDER position (0-100,
+-- what's stored/shown/saved everywhere else) maps to a louder mpv
+-- amplitude at the low end while both ends stay pinned: slider 0 -> 0,
+-- slider 20 -> ~45 (~-21dB), slider 50 -> ~71 (~-9dB), slider 100 -> 100.
+-- Net effect against the real cubic law is roughly 30*log10(slider) --
+-- a normal perceptual taper. Retune by changing the exponent, not by
+-- assuming a different base law without measuring mpv's actual output.
+local function volumeToMpv(v)
+  v = clampVolume(v)
+  return math.floor(math.sqrt(v / 100) * 100 + 0.5)
+end
+
 local function playStation(st)
   if type(st) ~= "table" or type(st.url) ~= "string" or st.url == "" then
     noctalia.notifyError(noctalia.tr("panel.title"), noctalia.tr("notify.no_url"))
@@ -216,7 +231,7 @@ local function playStation(st)
   -- input, and without it a URL starting with "-" is read as an mpv option.
   -- String form (not the argument array) because recording $! needs a
   -- shell; every interpolated value goes through shellQuote.
-  local cmd = "mpv --no-video --really-quiet --volume=" .. tostring(volume)
+  local cmd = "mpv --no-video --really-quiet --volume=" .. tostring(volumeToMpv(volume))
     .. " -- " .. shellQuote(st.url) .. " >/dev/null 2>&1 & echo $! > " .. shellQuote(PIDFILE)
   local ok = noctalia.runAsync(cmd)
   if not ok then

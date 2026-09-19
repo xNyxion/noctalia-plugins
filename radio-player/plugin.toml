@@ -1,6 +1,6 @@
 id          = "nyx/radio-player"
 name        = "Radio Player"
-version     = "2.0.0"
+version     = "2.0.1"
 plugin_api  = 24
 author      = "nyx"
 license     = "MIT"
