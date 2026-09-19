@@ -268,10 +268,26 @@ function render()
           value = vol,
           flexGrow = 1,
           controlSize = "sm",
-          onChange = function(v) pendingVolume = math.floor(v); render() end,
+          -- ui.slider hands onChange's value back as a STRING on this
+          -- Noctalia build (contra the runtime-api docs) -- tonumber() it
+          -- before math.floor(). onDragEnd is worse: it fires with NO value
+          -- argument at all (v is nil), so it cannot be trusted for the
+          -- final number -- it only means "drag finished, commit what
+          -- onChange last recorded". Fall back to pendingVolume, then to
+          -- the last known-good volume (currentVolume() is never nil) --
+          -- a click-to-jump with no preceding onChange would otherwise
+          -- drop the commit silently, with no log line to catch it.
+          onChange = function(v)
+            local n = tonumber(v)
+            if n then
+              pendingVolume = math.floor(n)
+              render()
+            end
+          end,
           onDragEnd = function(v)
+            local n = tonumber(v) or pendingVolume or currentVolume()
             pendingVolume = nil
-            sendCommand({ type = "volume", volume = math.floor(v) })
+            sendCommand({ type = "volume", volume = math.floor(n) })
           end,
         }),
         ui.label({

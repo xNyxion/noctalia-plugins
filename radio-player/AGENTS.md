@@ -132,6 +132,42 @@ to every intermediate position would restart the stream repeatedly. `ui.slider`
 is value-driven (unlike `ui.input`), so the current volume must be passed on
 every render or it snaps back.
 
+On this Noctalia build the slider's callback args did not match the docs:
+`onChange`'s value arrived as a string (`tonumber()` before `math.floor()`),
+and `onDragEnd` fired with no value argument at all — `v` is `nil`, so it
+falls back to whatever `onChange` last recorded in `pendingVolume`. Both are
+guarded in `panel.luau`; if a future Noctalia fixes the argument shape this
+code still works, it just never hits the nil branch.
+
+## Volume slider is perceptual, not linear amplitude
+
+`mpv --volume` is a CUBIC gain curve, not linear amplitude and not perceived
+loudness either — roughly `dB = 60*log10(v/100)`. 20% amplitude is already
+about a 42dB cut (measured directly against mpv's own PCM output, not
+assumed), close to silent — passing the slider value straight through made
+the bottom third of the range useless. `service.luau`'s `volumeToMpv()`
+applies `sqrt(slider/100) * 100` before the `--volume=` flag: slider 20 →
+mpv ~45 (~-21dB), slider 50 → mpv ~71 (~-9dB), slider 100 → mpv 100 (both
+ends pinned). Net effect against the real cubic law is close to
+`30*log10(slider)`, a normal perceptual taper.
+
+The STORED/SHOWN/SAVED volume (setting, `noctalia.state`, the slider position
+itself) is always the raw 0-100 slider value — the curve applies only at the
+mpv launch command. Anything that reads `volume` from state or config gets the
+slider number, not the mpv number; only `playStation()` converts.
+
+Retuning: change the exponent in `volumeToMpv`, don't re-derive from an
+assumed (rather than measured) mpv gain law — the linear assumption this fix
+replaced was wrong by nearly 30dB at the low end.
+
+**Known gap, not addressed here:** volume is not persisted anywhere.
+`loadConfig()` only reads the `volume` SETTING (manifest default 85);
+`setVolume()` never writes a file the way `saveFavorites()` does. It resets
+to the setting default on every Noctalia restart even though the user last
+had it elsewhere. Fixing this means mirroring `favorites.json`'s pattern: a
+small file in `pluginDataDir()`, written on every `setVolume()`, read in
+`loadConfig()` before falling back to the setting.
+
 ## No next/prev transport
 
 A radio stream has no tracks to skip. The panel's only transport control is
@@ -170,6 +206,17 @@ Caprice entries decoded at ~48 kbps and were replaced with genuine 320s.
 restart. It takes the identical path as `disable`, so the only open question
 is whether Noctalia reports `"shutdown"` and still runs `onExit` during
 teardown. If an mpv ever survives a Noctalia restart, look here first.
+
+v2.0.1: fixed the volume slider (`onDragEnd`/`onChange` callback arg shapes
+didn't match the runtime-api docs — string/nil, not number — see "Volume
+restarts the stream, on purpose" above) and the volume curve (mpv's
+`--volume` is cubic, not linear — see "Volume slider is perceptual, not
+linear amplitude"). Verified live via IPC (`volume <N>`) + `/proc/<pid>/cmdline`
+showing the converted mpv value at several slider positions, and via the log
+showing hot-reload with no new `[ERR]`. **Not verified:** an actual mouse
+drag on the slider (every check above went through IPC, which exercises
+`setVolume`/`playStation` but not the panel's `ui.slider` callbacks
+themselves) — do that once before trusting this fully.
 
 ## Debugging checklist
 

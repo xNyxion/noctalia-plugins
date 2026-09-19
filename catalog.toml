@@ -9,7 +9,7 @@
 [[plugin]]
 id           = "nyx/radio-player"
 name         = "Radio Player"
-version      = "2.0.0"
+version      = "2.0.1"
 author       = "nyx"
 license      = "MIT"
 icon         = "radio"
